@@ -36,10 +36,10 @@ class userdatabase:
     #  1 = user already exists
     def adduser(self,username,password):
         try:
-            if not self.client.indices.exists(index=username):
+            if not self.userexists(username):
                 doc = {
                     'username':username,
-                    'password': password
+                    'password': password,
                     }
                 res = self.client.index(index=username,id=1, body=doc)
                 print(res)
@@ -49,3 +49,6 @@ class userdatabase:
         except Exception as e:
             print(e)
             return -1
+
+    def userexists(self, username):
+        return self.client.indices.exists(index=username)

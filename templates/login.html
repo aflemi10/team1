@@ -1,6 +1,11 @@
-
+<head>
+    <message>
+        {{ message }}
+    </message>
+</head>
 <form action="/login" method="POST">
-<input type="username" name="username" placeholder="Username">
+
+<input type="username" name="username" placeholder="Username" value = {{ userin }}>
 <br><br>
 <input type="password" name="password" placeholder="Password">
 <br><br>
