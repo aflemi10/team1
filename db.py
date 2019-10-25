@@ -1,11 +1,11 @@
 from elasticsearch import Elasticsearch,NotFoundError
 
 #creating a class using elasticsearch
-class userdatabase:
+class userdb:
 
     #constructor for a given or a default host
     def __init__(self,host):
-        print("-------DATABASE UP---------")
+        print("-------USER DATABASE UP---------")
         if host==None:
             self.client=Elasticsearch('localhost')
         else:
@@ -39,7 +39,12 @@ class userdatabase:
             if not self.userexists(username):
                 doc = {
                     'username':username,
-                    'password': password,
+                    'password': password
+                    #items:[
+                        #item1,
+                        #item2,
+                        #item3
+                        #]
                     }
                 res = self.client.index(index=username,id=1, body=doc)
                 print(res)
@@ -52,3 +57,29 @@ class userdatabase:
 
     def userexists(self, username):
         return self.client.indices.exists(index=username)
+
+class itemdb:
+    def __init__(self,host):
+        print("-------ITEM DATABASE UP---------")
+        if host==None:
+            self.client=Elasticsearch('localhost')
+        else:
+            self.client=Elasticsearch(host)
+
+    def newitem(self,name,itemnum,price,quantity):
+        if not self.itemexists(itemnum):
+            doc = {
+                'username': username,
+                'password': password
+
+            }
+            res = self.client.index(index=itemnum, id=1, body=doc)
+            print(res)
+            return 0
+        else:
+            return 1
+
+
+    #def find_new_item_num(self):
+
+    #def getitem(self,item,)

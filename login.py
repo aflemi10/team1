@@ -1,9 +1,10 @@
 from flask import Flask, flash, redirect, render_template, request, session,url_for
-from db import userdatabase
+from db import userdb,itemdb
 import hashlib
 
 app = Flask(__name__)
-dbase = userdatabase(None)
+users = userdb(None)
+items = itemdb(None)
 
 @app.route('/')
 def goto_login():
@@ -30,11 +31,11 @@ def get_new_account_info():
         return render_template('adduser.html', message="Password must be longer than 6 characters",userin=username)
     if password != vpassword:
         return render_template('adduser.html', message="passwords do not match",userin=username)
-    if dbase.userexists(username):
+    if users.userexists(username):
         return render_template('adduser.html', message="username entered is already in use")
 
     #redirect back to login page
-    res = dbase.adduser(username, password)
+    res = users.adduser(username, password)
     assert res == 0
     return render_template('login.html',message="User account created successfully")
 
@@ -46,7 +47,7 @@ def show_login():
 def do_login():
     username = request.form['username']
     password = request.form['password']
-    res=dbase.login(username,password)
+    res=users.login(username,password)
 
     # TODO : add more verification to username and password if needed
     # TODO : hash and salt password inputs before anything else
