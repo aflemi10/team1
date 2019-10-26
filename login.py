@@ -59,7 +59,7 @@ def do_login():
     if res == 0:
         #TODO : Log user in using session
         #TODO : Make a user home page and redirect to it
-        return(f'user home page for {username}')
+        return(users.get_user(username))
 
     if res == 1:
         return render_template('login.html',message = "Username not found")

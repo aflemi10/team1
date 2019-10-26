@@ -21,16 +21,16 @@ class userdb:
             res = self.client.get(index=username,id=1)
             dbpassword = res['_source']['password']
             if dbpassword == password:
-                 doc = {
+                doc = {
                     'username':username,
                     'password': password,
                     'is_logged_in': "True",
-                    'user_profile'={
-                        'items'=[]
+                    'user_profile':{
+                        'items':[]
                         }
                     }
                 res = self.client.index(index=username,id=1, body=doc)
-                return self.get_user()
+                return 0
             else:
                 return 2
         except NotFoundError:
@@ -54,18 +54,23 @@ class userdb:
 
     def get_user(self,username):
         try:
-            assert check_login_status(username)
-            res = self.get(index=username,id=1)
+            #print(self.check_login_status(username))
+            assert self.check_login_status(username)
+            res = self.client.get(index=username,id=1)
             return res
         except Exception as e:
-            return False
+            raise e
+            
 
     def check_login_status(self,username):
         try:
             res = self.client.get(index=username,id=1)
+            #print(res)
             assert res['_source']['is_logged_in']=="True"
+            #print("---true---")
             return True
         except exception as e:
+            #print("---False---")
             return False
 
     
@@ -81,24 +86,22 @@ class userdb:
                     'username':username,
                     'password': password,
                     'is_logged_in': "False",
-                    'user_profile'={
-                        'items'=[]
+                    'user_profile':{
+                        'items':[]
                         }
                     }
                 res = self.client.index(index=username,id=1, body=doc)
-                print(res)
+               # print(res)
                 return 0
             else:
                 return 1
         except Exception as e:
             print(e)
             return -1
-    def 
 
     def userexists(self, username):
         return self.client.indices.exists(index=username)
 
-    def addItem(self,user):
 
 class itemdb:
     def __init__(self,host):
@@ -118,7 +121,7 @@ class itemdb:
 
             }
             res = self.client.index(index=itemnum, id=1, body='item')
-            print(res)
+           # print(res)
             return 0
         else:
             return 1
