@@ -13,7 +13,11 @@ def scrapeCmdLine():
     zipcode = sys.argv[1]
     grocery_item = sys.argv[2]
     chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--incognito")
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.set_experimental_option("useAutomationExtenstion",false)
     driver = webdriver.Chrome(chrome_options=chrome_options)
 
     try:
@@ -85,9 +89,16 @@ def scrape(zipcode,grocery_item):
         output =[]
         zipcode = zipcode
         grocery_item = grocery_item
+
         chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--incognito")
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+       # chrome_options.set_experimental_option("useAutomationExtenstion",false)
         driver = webdriver.Chrome(chrome_options=chrome_options)
+        driver.maximize_window()
+        
         try:
             driver.get("https://www.safeway.com")
             timeout = 5
