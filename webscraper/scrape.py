@@ -147,7 +147,7 @@ def scrape(zipcode,grocery_item):
                 except Exception as e:
                     timeout -=1
                     time.sleep(1)
-
+            print("\n")
             for x in range(5):
                 groc_prices[x]=groc_prices[x].text.split("\n")[1]
                 output.append(groc_prices[x])
@@ -164,13 +164,26 @@ def test():
     zipcodes=["22193","22030","20603","22192"]
     foods = ["milk","chicken","bread","ground beef","rice","beans","broccoli"]
     output = []
-    for x in range(10):
+    failures = []
+    test_i=50
+    for x in range(test_i):
         try:
             scrape(zipcodes[x%len(zipcodes)],foods[x%len(foods)])
             output.append("success\n")
+            print("success")
         except Exception as e:
-            output.append("failure --- " + str(e))
+            print("failure")
+            output.append("failure")
+            failures.append(str(e))
     for x in range(len(output)):
         print(output[x])
+
+    if len(failures)>0:
+        print("\n\nfailures\n")
+        for x in range(len(failures)):
+            print(failures[x]+"\n")
+    sr= ((test_i-len(failures))/test_i)*100.00 
+    print(f'success rate = {sr}')
+
 
 test()
