@@ -161,11 +161,12 @@ def scrape(zipcode,grocery_item):
             driver.close()
 
 def test():
-    zipcodes=["22193","22030","20603","22192"]
-    foods = ["milk","chicken","bread","ground beef","rice","beans","broccoli"]
+    zipcodes=["22193","22030","20603","22192","22032"]
+    foods = ["milk","chicken","bread","ground beef","rice","beans","broccoli","juice","pork","apples","oranges","celery","cereal"]
     output = []
     failures = []
-    test_i=50
+    test_i=100
+    start = time.time()
     for x in range(test_i):
         try:
             scrape(zipcodes[x%len(zipcodes)],foods[x%len(foods)])
@@ -184,6 +185,8 @@ def test():
             print(failures[x]+"\n")
     sr= ((test_i-len(failures))/test_i)*100.00 
     print(f'success rate = {sr}')
-
+    end = time.time()
+    print(end - start)
+    print((end - start)/test_i)
 
 test()
