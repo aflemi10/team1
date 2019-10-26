@@ -94,13 +94,16 @@ def scrape(zipcode,grocery_item):
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--incognito")
         chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-popup-blocking")
         chrome_options.add_argument("--disable-dev-shm-usage")
-       # chrome_options.set_experimental_option("useAutomationExtenstion",false)
         driver = webdriver.Chrome(chrome_options=chrome_options)
-        driver.maximize_window()
-        
-        try:
-            driver.get("https://www.safeway.com")
+        try:    
+            driver.get("https://www.safeway.com/home.html")
+            try:
+                driver.find_element_by_id('cookieConsentClose').click()
+                
+            except Exception as e:
+                pass
             timeout = 5
             while timeout > 0:
                 try:
@@ -119,8 +122,6 @@ def scrape(zipcode,grocery_item):
                 except Exception as e:
                     time.sleep(.1)
                     timeout -= .1
-                    print(timeout)
-
             change_zip_input.clear()
             time.sleep(.1)
             change_zip_input.send_keys(zipcode)
@@ -169,8 +170,6 @@ def test():
             output.append("success\n")
         except Exception as e:
             output.append("failure --- " + str(e))
-
-            print(e)
     for x in range(len(output)):
         print(output[x])
 
