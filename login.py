@@ -11,11 +11,11 @@ def goto_login():
     #TODO : get page to redirect straight to login and get sessions to work
     return redirect(url_for('login'))
 
-@app.route('/createaccount',methods=['GET'])
+@app.route('/createuser',methods=['GET'])
 def show_create_account():
     return render_template('adduser.html')
 
-@app.route('/createaccount',methods=['POST'])
+@app.route('/createuser',methods=['POST'])
 def get_new_account_info():
     username = request.form['username']
     password = request.form['password']
@@ -66,6 +66,53 @@ def do_login():
 
     if res == 2:
         return render_template('login.html',message = "Incorrect password",userin = username)
+
+
+@app.route('/logout', methods=['POST'])
+def do_logout():
+    return "Endpoint not constructed yet"
+
+@app.route('/updatezip', methods=['POST'])
+def updatezip():
+    return "Endpoint not constructed yet"
+
+@app.route('/items/add', methods=['POST'])
+def add_items():
+    return "Endpoint not constructed yet"
+
+@app.route('/items/remove', methods=['POST'])
+def remove_items():
+    return "Endpoint not constructed yet"
+
+
+@app.route('/items/get', methods=['GET'])
+def get_items():
+    return "Endpoint not constructed yet"
+
+
+@app.route('/nutritional/weight', methods=['GET'])
+def add_weight():
+    return "Endpoint not constructed yet"
+
+
+@app.route('/nutritional/calories', methods=['GET'])
+def add_calories():
+    return "Endpoint not constructed yet"
+
+
+@app.route('/nutritional/weight', methods=['POST'])
+def get_weight():
+    return "Endpoint not constructed yet"
+
+
+@app.route('/nutritional/calories', methods=['POST'])
+def get_calories():
+    return "Endpoint not constructed yet"
+
+
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True,host='0.0.0.0', port=5000)

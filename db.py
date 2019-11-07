@@ -38,7 +38,7 @@ class userdb:
         except Exception as e:
             print(e)
             return -1
-    
+
     def logout(self,username):
         try:
             assert check_login_status(username)
@@ -60,7 +60,7 @@ class userdb:
             return res
         except Exception as e:
             raise e
-            
+
 
     def check_login_status(self,username):
         try:
@@ -73,7 +73,7 @@ class userdb:
             #print("---False---")
             return False
 
-    
+
 
     #returns
     # -1 = error
@@ -118,12 +118,9 @@ class itemdb:
                 'item_num': itemnum,
                 'price':price,
                 'quantity':quantity
-
             }
             res = self.client.index(index=itemnum, id=1, body='item')
            # print(res)
             return 0
         else:
             return 1
-
-
