@@ -22,11 +22,11 @@ class userdb:
             dbpassword = res['_source']['password']
             if dbpassword == password:
                 doc = {
-                    'username':username,
                     'password': password,
                     'is_logged_in': "True",
                     'user_profile':{
-                        'items':[]
+                        'username':username,
+                        'items':""
                         }
                     }
                 res = self.client.index(index=username,id=1, body=doc)
@@ -34,33 +34,51 @@ class userdb:
             else:
                 return 2
         except NotFoundError:
+            print(f'{username} not found')
             return 1
         except Exception as e:
             print(e)
             return -1
 
+
+    #returns
+    # 1 - user cannot be logged out, either not logged in or couldnot be found
     def logout(self,username):
         try:
-            assert check_login_status(username)
+            assert self.check_login_status(username)
             doc = {
-                'username':username,
-                'password': password,
-                'is_logged_in': "False",
-                'items':[]
+                'password': self.get_user_pword(username),
+                'is_logged_in': "True",
+                'user_profile':{
+                    'username':username,
+                    'items':""
+                    }
                 }
             res = self.client.index(index=username,id=1, body=doc)
+            return 0
         except Exception as e:
-            return False
+            print("\n")
+            print(e)
+            return -1
 
-    def get_user(self,username):
+    def get_user_pword(self,username):
         try:
-            #print(self.check_login_status(username))
-            assert self.check_login_status(username)
+            #print(self.check_login_status(username)
             res = self.client.get(index=username,id=1)
+            res = res['_source']['password']
             return res
         except Exception as e:
             raise e
 
+    def get_user_full(self,username):
+        try:
+            #print(self.check_login_status(username))
+            assert self.check_login_status(username)
+            res = self.client.get(index=username,id=1)
+            res = res['_source']
+            return res
+        except Exception as e:
+            raise e
 
     def check_login_status(self,username):
         try:
@@ -69,11 +87,30 @@ class userdb:
             assert res['_source']['is_logged_in']=="True"
             #print("---true---")
             return True
-        except exception as e:
+        except Exception as e:
             #print("---False---")
             return False
 
+    def get_items(self,username):
+        try:
+            assert self.check_login_status(username)
+            res = self.get_user_full(username)
+            res = res['user_profile']
+            res = res["items"]
+            res =str(res)
+            #print(f'res {res}')
+            print(res)
+            return res
+        except Exception as e:
 
+            return(f'oof {e}')
+
+    def add_items(self,username,items):
+        try:
+            assert self.check_login_status(username)
+
+        except Exception as e:
+            return False
 
     #returns
     # -1 = error
@@ -87,7 +124,7 @@ class userdb:
                     'password': password,
                     'is_logged_in': "False",
                     'user_profile':{
-                        'items':[]
+                        'items':""
                         }
                     }
                 res = self.client.index(index=username,id=1, body=doc)

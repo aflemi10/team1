@@ -45,40 +45,59 @@ def show_login():
 
 @app.route('/login', methods=['POST'])
 def do_login():
-    username = request.form['username']
-    password = request.form['password']
-    res=users.login(username,password)
+    try:
+        #username = request.form['username']
+        #password = request.form['password']
+        username = request.args.get('username')
+        password = request.args.get('password')
+        res=users.login(username,password)
+        # TODO : add more verification to username and password if needed
+        # TODO : hash and salt password inputs before anything else
 
-    # TODO : add more verification to username and password if needed
-    # TODO : hash and salt password inputs before anything else
+        if res == -1:
+            #TODO : Make an error page and redirect to it
+            return("error page")
 
-    if res == -1:
-        #TODO : Make an error page and redirect to it
-        return("error page")
+        if res == 0:
+            #TODO : Log user in using session
+            #TODO : Make a user home page and redirect to it
+            res =users.get_user_full(username)
+            return res['user_profile']
 
-    if res == 0:
-        #TODO : Log user in using session
-        #TODO : Make a user home page and redirect to it
-        return(users.get_user(username))
+        if res == 1:
+            return render_template('login.html',message = "Username not found")
 
-    if res == 1:
-        return render_template('login.html',message = "Username not found")
-
-    if res == 2:
-        return render_template('login.html',message = "Incorrect password",userin = username)
+        if res == 2:
+            return render_template('login.html',message = "Incorrect password",userin = username)
+    except Exception as e:
+        return e
 
 
 @app.route('/logout', methods=['POST'])
 def do_logout():
-    return "Endpoint not constructed yet"
+    username = request.args.get('username')
+    res = users.logout(username)
+
+    if res == -1:
+        return("Error page")
+    if res == 0:
+        return("user logged out")
+
+
 
 @app.route('/updatezip', methods=['POST'])
 def updatezip():
     return "Endpoint not constructed yet"
 
+
 @app.route('/items/add', methods=['POST'])
 def add_items():
+    username = request.args.get('username')
+    items = request.args.get('items')
+
     return "Endpoint not constructed yet"
+
+
 
 @app.route('/items/remove', methods=['POST'])
 def remove_items():
@@ -87,8 +106,10 @@ def remove_items():
 
 @app.route('/items/get', methods=['GET'])
 def get_items():
-    return "Endpoint not constructed yet"
-
+    username = request.args.get('username')
+    res = users.get_items(username)
+    print(res)
+    return res
 
 @app.route('/nutritional/weight', methods=['GET'])
 def add_weight():
