@@ -1,6 +1,7 @@
 from flask import Flask, flash, redirect, render_template, request, session,url_for
 from db import userdb,itemdb
 import hashlib
+import pprint
 
 app = Flask(__name__)
 users = userdb(None)
@@ -11,11 +12,11 @@ def goto_login():
     #TODO : get page to redirect straight to login and get sessions to work
     return redirect(url_for('login'))
 
-@app.route('/createuser',methods=['GET'])
+@app.route('/createaccount',methods=['GET'])
 def show_create_account():
     return render_template('adduser.html')
 
-@app.route('/createuser',methods=['POST'])
+@app.route('/createaccount',methods=['POST'])
 def get_new_account_info():
     username = request.form['username']
     password = request.form['password']
@@ -46,10 +47,13 @@ def show_login():
 @app.route('/login', methods=['POST'])
 def do_login():
     try:
-        #username = request.form['username']
-        #password = request.form['password']
-        username = request.args.get('username')
-        password = request.args.get('password')
+        try:
+            username = request.form['username']
+            password = request.form['password']
+        except Exception as e:
+            username = request.args.get('username')
+            password = request.args.get('password')
+        pprint.pprint(request.__dict__)
         res=users.login(username,password)
         # TODO : add more verification to username and password if needed
         # TODO : hash and salt password inputs before anything else
