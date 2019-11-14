@@ -20,13 +20,14 @@ class userdb:
         try:
             res = self.client.get(index=username,id=1)
             dbpassword = res['_source']['password']
+            items = res["_source"]['user_profile']['items']
             if dbpassword == password:
                 doc = {
-                    'password': password,
+                    'password': dbpassword,
                     'is_logged_in': "True",
                     'user_profile':{
                         'username':username,
-                        'items':""
+                        'items':items
                         }
                     }
                 res = self.client.index(index=username,id=1, body=doc)
@@ -43,15 +44,18 @@ class userdb:
 
     #returns
     # 1 - user cannot be logged out, either not logged in or couldnot be found
+    # 0 - user was logged out successfully
     def logout(self,username):
         try:
             assert self.check_login_status(username)
+            info=self.get_user_full(username)
+
             doc = {
-                'password': self.get_user_pword(username),
-                'is_logged_in': "True",
+                'password': info['password'],
+                'is_logged_in': "False",
                 'user_profile':{
                     'username':username,
-                    'items':""
+                    'items': info['user_profile']['items']
                     }
                 }
             res = self.client.index(index=username,id=1, body=doc)
@@ -61,6 +65,8 @@ class userdb:
             print(e)
             return -1
 
+
+    #backend use only
     def get_user_pword(self,username):
         try:
             #print(self.check_login_status(username)
@@ -70,6 +76,9 @@ class userdb:
         except Exception as e:
             raise e
 
+
+    # db use only
+    # returns full user account
     def get_user_full(self,username):
         try:
             #print(self.check_login_status(username))
@@ -80,6 +89,9 @@ class userdb:
         except Exception as e:
             raise e
 
+    # db use only
+    # returns true if user is currently logged in
+    # returns false if not
     def check_login_status(self,username):
         try:
             res = self.client.get(index=username,id=1)
@@ -91,6 +103,7 @@ class userdb:
             #print("---False---")
             return False
 
+    # returns users items
     def get_items(self,username):
         try:
             assert self.check_login_status(username)
@@ -98,19 +111,27 @@ class userdb:
             res = res['user_profile']
             res = res["items"]
             res =str(res)
-            #print(f'res {res}')
-            print(res)
             return res
         except Exception as e:
+            print(e)
 
-            return(f'oof {e}')
-
-    def add_items(self,username,items):
+    def add_item(self,username,items):
         try:
+            res = self.get_user_full(username)
             assert self.check_login_status(username)
-
+            items = res['user_profile']['items']
+            doc = {
+                'password': res['password'],
+                'is_logged_in': "True",
+                'user_profile':{
+                    'username':username,
+                    'items':res['user_profile']['items']
+                    }
+                }
+            res = self.client.index(index=username,id=1, body=doc)
+            return 0
         except Exception as e:
-            return False
+            return 1
 
     #returns
     # -1 = error
@@ -136,6 +157,9 @@ class userdb:
             print(e)
             return -1
 
+    # db use only
+    # returns true if user exists
+    # returns false if not
     def userexists(self, username):
         return self.client.indices.exists(index=username)
 
@@ -147,6 +171,7 @@ class itemdb:
             self.client=Elasticsearch('localhost')
         else:
             self.client=Elasticsearch(host)
+        self.items = 0
 
     def newitem(self,name,itemnum,price,quantity):
         if not self.itemexists(itemnum):
@@ -161,3 +186,13 @@ class itemdb:
             return 0
         else:
             return 1
+
+
+    def get_new_item_num(self):
+        self.items+=1
+        return self.items
+
+
+
+    def searchitem(self,name):
+        return None

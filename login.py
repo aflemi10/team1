@@ -94,9 +94,7 @@ def updatezip():
 def add_items():
     username = request.args.get('username')
     items = request.args.get('items')
-
     return "Endpoint not constructed yet"
-
 
 
 @app.route('/items/remove', methods=['POST'])
