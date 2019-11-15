@@ -21,6 +21,8 @@ class userdb:
             res = self.client.get(index=username,id=1)
             dbpassword = res['_source']['password']
             items = res["_source"]['user_profile']['items']
+            assert res['_source']['is_logged_in'] == "False"
+            print(res['_source'])
             if dbpassword == password:
                 doc = {
                     'password': dbpassword,
@@ -196,3 +198,14 @@ class itemdb:
 
     def searchitem(self,name):
         return None
+
+udb = userdb(None)
+res=udb.logout("allen")
+print(f'logout: {res}')
+
+res =udb.login("allen","oofoof")
+
+print(f'login: {res}')
+res =udb.login("allen","oofoof")
+
+print(f'login: {res}')
