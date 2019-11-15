@@ -117,17 +117,17 @@ class userdb:
         except Exception as e:
             print(e)
 
-    def add_item(self,username,items):
+    def add_item(self,username,newitems):
         try:
             res = self.get_user_full(username)
             assert self.check_login_status(username)
-            items = res['user_profile']['items']
+            items = res['user_profile']['items']+newitems
             doc = {
                 'password': res['password'],
                 'is_logged_in': "True",
                 'user_profile':{
                     'username':username,
-                    'items':res['user_profile']['items']
+                    'items': items
                     }
                 }
             res = self.client.index(index=username,id=1, body=doc)
@@ -147,7 +147,7 @@ class userdb:
                     'password': password,
                     'is_logged_in': "False",
                     'user_profile':{
-                        'items':""
+                        'items':[]
                         }
                     }
                 res = self.client.index(index=username,id=1, body=doc)
@@ -200,12 +200,19 @@ class itemdb:
         return None
 
 udb = userdb(None)
+#login user
+res=udb.login("allen","password")
+print(f'login:{res}')
+
+#add item to user
+res=udb.add_item("allen","test_item")
+print(f'add item:{res}')
+
+#
 res=udb.logout("allen")
-print(f'logout: {res}')
+res=udb.login("allen","password")
+print(f'ahaha:{res}')
 
-res =udb.login("allen","oofoof")
+#
 
-print(f'login: {res}')
-res =udb.login("allen","oofoof")
-
-print(f'login: {res}')
+#
