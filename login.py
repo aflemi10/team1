@@ -40,6 +40,12 @@ def get_new_account_info():
     assert res == 0
     return render_template('login.html',message="User account created successfully")
 
+@app.route('/isloggedin')
+def check_logged_in():
+    username = request.args.get('username')
+    res= users.check_login_status(username)
+    print(res)
+
 @app.route('/login',methods=['GET'])
 def show_login():
     return render_template('login.html')

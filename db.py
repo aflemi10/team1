@@ -214,6 +214,14 @@ class itemdb:
             self.client=Elasticsearch(host)
         self.items = 0
 
+    #Should be redone
+    def get_item_by_name(self, item_name):
+        res =self.client.search(index="*", body={"query": {"match": {'name': item_name}}})
+        print("---")
+        pprint.pprint(res)
+        print("---")
+        return res
+
     def newitem(self,item_name,price,quantity):
         item_num = self.get_new_item_num()
         print(item_num)
@@ -249,26 +257,30 @@ class itemdb:
     def searchitem(self,name):
         return None
 
-os.system("curl -XDELETE localhost:9200/*")
-udb = userdb(None)
-#login user
-res=udb.adduser("allen","oofoof")
-res=udb.login("allen","oofoof")
-res = udb.clear_fields("allen")
-res=udb.add_item("allen","1")
-udb.print_user_pretty("allen")
-print("\n")
-res=udb.add_item("allen","2")
-udb.print_user_pretty("allen")
+def test():
+    os.system("curl -XDELETE localhost:9200/*")
+    udb = userdb(None)
+    #login user
+    res=udb.adduser("allen","oofoof")
+    res=udb.login("allen","oofoof")
+    res = udb.clear_fields("allen")
+    res=udb.add_item("allen","1")
+    udb.print_user_pretty("allen")
+    print("\n")
+    res=udb.add_item("allen","2")
+    udb.print_user_pretty("allen")
 
 
-idb = itemdb(None)
-res = idb.newitem("apples","5.99","3")
-print(res)
-print("---")
-res = idb.newitem("oranges","3.00","12")
-print(res)
-idb.print_item_full(1)
-idb.print_item_full(2)
-os.system("curl -XDELETE localhost:9200/*")
-#
+    idb = itemdb(None)
+    res = idb.newitem("apples","5.99","3")
+    print(res)
+    print("---")
+    res = idb.newitem("oranges","3.00","12")
+    print(res)
+    idb.print_item_full(1)
+    idb.print_item_full(2)
+
+    idb.get_item_by_name("apples")
+
+    os.system("curl -XDELETE localhost:9200/*")
+    #
