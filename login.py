@@ -44,7 +44,7 @@ def get_new_account_info():
 def check_logged_in():
     username = request.args.get('username')
     res= users.check_login_status(username)
-    print(res)
+    return str(res) 
 
 @app.route('/login',methods=['GET'])
 def show_login():
