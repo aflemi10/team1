@@ -1,4 +1,5 @@
 from elasticsearch import Elasticsearch,NotFoundError
+import pprint,os
 
 #creating a class using elasticsearch
 class userdb:
@@ -19,17 +20,20 @@ class userdb:
     def login(self,username,password):
         try:
             res = self.client.get(index=username,id=1)
+            assert res['_source']['is_logged_in'] == "False"
             dbpassword = res['_source']['password']
             items = res["_source"]['user_profile']['items']
-            assert res['_source']['is_logged_in'] == "False"
-            print(res['_source'])
+            weight_data = res["_source"]['user_profile']['weight_data']
+            cal_data = res["_source"]['user_profile']['cal_data']
             if dbpassword == password:
                 doc = {
                     'password': dbpassword,
                     'is_logged_in': "True",
                     'user_profile':{
                         'username':username,
-                        'items':items
+                        'items':items,
+                        'weight_data': weight_data,
+                        'cal_data': cal_data
                         }
                     }
                 res = self.client.index(index=username,id=1, body=doc)
@@ -51,13 +55,17 @@ class userdb:
         try:
             assert self.check_login_status(username)
             info=self.get_user_full(username)
-
+            items = info['user_profile']['items']
+            weight_data = info['user_profile']['weight_data']
+            cal_data = info['user_profile']['cal_data']
             doc = {
                 'password': info['password'],
                 'is_logged_in': "False",
                 'user_profile':{
                     'username':username,
-                    'items': info['user_profile']['items']
+                    'items': items,
+                    'weight_data': weight_data,
+                    'cal_data': cal_data
                     }
                 }
             res = self.client.index(index=username,id=1, body=doc)
@@ -121,19 +129,44 @@ class userdb:
         try:
             res = self.get_user_full(username)
             assert self.check_login_status(username)
-            items = res['user_profile']['items']+newitems
+            items = res['user_profile']['items']
+            weight_data = res['user_profile']['weight_data']
+            cal_data = res['user_profile']['cal_data']
+            items.append(newitems)
             doc = {
                 'password': res['password'],
                 'is_logged_in': "True",
                 'user_profile':{
                     'username':username,
-                    'items': items
+                    'items': items,
+                    'weight_data': weight_data,
+                    'cal_data': cal_data
                     }
                 }
             res = self.client.index(index=username,id=1, body=doc)
             return 0
         except Exception as e:
             return 1
+
+    def clear_fields(self,username):
+        try:
+            res = self.get_user_full(username)
+            assert self.check_login_status(username)
+            doc = {
+                'password': res['password'],
+                'is_logged_in': "True",
+                'user_profile':{
+                    'username':username,
+                    'items': [],
+                    'weight_data': [],
+                    'cal_data': []
+                    }
+                }
+            res = self.client.index(index=username,id=1, body=doc)
+            return 0
+        except Exception as e:
+            return 1
+
 
     #returns
     # -1 = error
@@ -143,13 +176,15 @@ class userdb:
         try:
             if not self.userexists(username):
                 doc = {
-                    'username':username,
                     'password': password,
                     'is_logged_in': "False",
-                    'user_profile':{
-                        'items':[]
-                        }
+                    'user_profile': {
+                        'username': username,
+                        'items': [],
+                        'weight_data': [],
+                        'cal_data': []
                     }
+                }
                 res = self.client.index(index=username,id=1, body=doc)
                # print(res)
                 return 0
@@ -158,6 +193,10 @@ class userdb:
         except Exception as e:
             print(e)
             return -1
+
+    def print_user_pretty(self,username):
+        res= self.get_user_full(username)
+        pprint.pprint(res)
 
     # db use only
     # returns true if user exists
@@ -175,44 +214,61 @@ class itemdb:
             self.client=Elasticsearch(host)
         self.items = 0
 
-    def newitem(self,name,itemnum,price,quantity):
-        if not self.itemexists(itemnum):
+    def newitem(self,item_name,price,quantity):
+        item_num = self.get_new_item_num()
+        print(item_num)
+        if not self.client.indices.exists(item_num):
             doc = {
                 'item_name': item_name,
-                'item_num': itemnum,
                 'price':price,
                 'quantity':quantity
             }
-            res = self.client.index(index=itemnum, id=1, body='item')
+            res = self.client.index(index=item_num, id=1, body=doc)
            # print(res)
-            return 0
+            return item_num
         else:
-            return 1
+            return -1
 
+    def print_item_full(self,item_num):
+        res =self.client.get(index=item_num,id=1)
+        pprint.pprint(res['_source'])
 
     def get_new_item_num(self):
         self.items+=1
         return self.items
 
+    def get_item_full(self, itemnum):
+        try:
+            res = self.client.get(index=itemnum, id=1)
+            res = res['_source']
+            return res
+        except Exception as e:
+            raise e
 
 
     def searchitem(self,name):
         return None
 
+os.system("curl -XDELETE localhost:9200/*")
 udb = userdb(None)
 #login user
-res=udb.login("allen","password")
-print(f'login:{res}')
+res=udb.adduser("allen","oofoof")
+res=udb.login("allen","oofoof")
+res = udb.clear_fields("allen")
+res=udb.add_item("allen","1")
+udb.print_user_pretty("allen")
+print("\n")
+res=udb.add_item("allen","2")
+udb.print_user_pretty("allen")
 
-#add item to user
-res=udb.add_item("allen","test_item")
-print(f'add item:{res}')
 
-#
-res=udb.logout("allen")
-res=udb.login("allen","password")
-print(f'ahaha:{res}')
-
-#
-
+idb = itemdb(None)
+res = idb.newitem("apples","5.99","3")
+print(res)
+print("---")
+res = idb.newitem("oranges","3.00","12")
+print(res)
+idb.print_item_full(1)
+idb.print_item_full(2)
+os.system("curl -XDELETE localhost:9200/*")
 #
