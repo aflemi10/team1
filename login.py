@@ -18,20 +18,15 @@ def show_create_account():
 
 @app.route('/createaccount',methods=['POST'])
 def get_new_account_info():
-    username = request.form['username']
-    password = request.form['password']
-    vpassword = request.form['verify password']
+    username = request.args.get('username')
+    password = request.args.get('password')
 
     if len(username) == 0:
         return render_template('adduser.html',message = "Please enter a username")
     if len(password) == 0:
         return render_template('adduser.html', message="Please enter a password",userin=username)
-    if len(vpassword) == 0:
-        return render_template('adduser.html', message="Please verify password",userin=username)
     if len(password) < 6:
         return render_template('adduser.html', message="Password must be longer than 6 characters",userin=username)
-    if password != vpassword:
-        return render_template('adduser.html', message="passwords do not match",userin=username)
     if users.userexists(username):
         return render_template('adduser.html', message="username entered is already in use")
 
@@ -41,7 +36,7 @@ def get_new_account_info():
     return render_template('login.html',message="User account created successfully")
 
 @app.route('/isloggedin')
-def check_logged_in():
+def check_logged_in(),:
     username = request.args.get('username')
     res= users.check_login_status(username)
     return str(res) 
@@ -100,10 +95,10 @@ def updatezip():
     return "Endpoint not constructed yet"
 
 
-@app.route('/items/add', methods=['POST'])
-def add_items():
+@app.route('/item/add', methods=['POST'])
+def add_item():
     username = request.args.get('username')
-    items = request.args.get('items')
+    item = request.args.get('items')
     return "Endpoint not constructed yet"
 
 

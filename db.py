@@ -125,7 +125,7 @@ class userdb:
         except Exception as e:
             print(e)
 
-    def add_item(self,username,newitems):
+    def add_item(self,username,name,expiration,price):
         try:
             res = self.get_user_full(username)
             assert self.check_login_status(username)
@@ -248,7 +248,7 @@ class itemdb:
     def get_item_full(self, itemnum):
         try:
             res = self.client.get(index=itemnum, id=1)
-            res = res['_source']
+            res = res
             return res
         except Exception as e:
             raise e
