@@ -1,6 +1,6 @@
 from elasticsearch import Elasticsearch,NotFoundError
 import pprint,os
-
+from datetime import datetime
 #creating a class using elasticsearch
 class userdb:
 
@@ -132,7 +132,13 @@ class userdb:
             items = res['user_profile']['items']
             weight_data = res['user_profile']['weight_data']
             cal_data = res['user_profile']['cal_data']
-            items.append(newitems)
+            newitem={
+                'name':name,
+                'expiration':expiration,
+                'price':price
+            }
+
+            items.append(newitem)
             doc = {
                 'password': res['password'],
                 'is_logged_in': "True",
@@ -168,6 +174,7 @@ class userdb:
             return 1
 
 
+
     #returns
     # -1 = error
     #  0 = user added
@@ -197,6 +204,65 @@ class userdb:
     def print_user_pretty(self,username):
         res= self.get_user_full(username)
         pprint.pprint(res)
+
+    def add_calorie_data(self,username,calories):
+        try:
+            res = self.get_user_full(username)
+            assert self.check_login_status(username)
+            items = res['user_profile']['items']
+            weight_data = res['user_profile']['weight_data']
+            cal_data = res['user_profile']['cal_data']
+            new_cal_data={
+                'datetime',datetime.now(),
+                'calories',weight
+            }
+
+            cal_data.append(new_cal_data)
+            doc = {
+                'password': res['password'],
+                'is_logged_in': "True",
+                'user_profile':{
+                    'username':username,
+                    'items': items,
+                    'weight_data': weight_data,
+                    'cal_data': cal_data
+                    }
+                }
+            res = self.client.index(index=username,id=1, body=doc)
+            return 0
+        except Exception as e:
+            print(e)
+            return -1
+
+    def add_weight_data(self,username,weight):
+        try:
+            res = self.get_user_full(username)
+            assert self.check_login_status(username)
+            items = res['user_profile']['items']
+            weight_data = res['user_profile']['weight_data']
+            cal_data = res['user_profile']['cal_data']
+            new_weight_data={
+                'datetime',datetime.now(),
+                'weight',weight
+            }
+
+            weight_data.append(new_weight_data)
+            doc = {
+                'password': res['password'],
+                'is_logged_in': "True",
+                'user_profile':{
+                    'username':username,
+                    'items': items,
+                    'weight_data': weight_data,
+                    'cal_data': cal_data
+                    }
+                }
+            res = self.client.index(index=username,id=1, body=doc)
+            return 0
+        except Exception as e:
+            print(e)
+            return -1
+
 
     # db use only
     # returns true if user exists
