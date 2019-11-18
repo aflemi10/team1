@@ -12,6 +12,11 @@ def goto_login():
     #TODO : get page to redirect straight to login and get sessions to work
     return redirect(url_for('login'))
 
+@app.route('/get_user_full',methods=['GET'])
+def get_user():
+    username = request.args.get('username')
+    return users.get_user_full(username)
+
 @app.route('/createaccount',methods=['GET'])
 def show_create_account():
     return render_template('adduser.html')
@@ -36,10 +41,10 @@ def get_new_account_info():
     return render_template('login.html',message="User account created successfully")
 
 @app.route('/isloggedin')
-def check_logged_in(),:
+def check_logged_in():
     username = request.args.get('username')
     res= users.check_login_status(username)
-    return str(res) 
+    return str(res)
 
 @app.route('/login',methods=['GET'])
 def show_login():
@@ -95,11 +100,22 @@ def updatezip():
     return "Endpoint not constructed yet"
 
 
-@app.route('/item/add', methods=['POST'])
+@app.route('/items/add', methods=['POST'])
 def add_item():
     username = request.args.get('username')
-    item = request.args.get('items')
-    return "Endpoint not constructed yet"
+    itemname = request.args.get('item_name')
+    expiration = request.args.get('expr_date')
+    price = request.args.get('price')
+    if(expiration==None):
+        expiration='null'
+
+    if(price==None):
+        price='null'
+
+
+    res = users.add_item(username,itemname,expiration,price)
+
+    return str(res)
 
 
 @app.route('/items/remove', methods=['POST'])
@@ -111,27 +127,32 @@ def remove_items():
 def get_items():
     username = request.args.get('username')
     res = users.get_items(username)
-    print(res)
     return res
 
 @app.route('/nutritional/weight', methods=['GET'])
-def add_weight():
-    return "Endpoint not constructed yet"
-
-
-@app.route('/nutritional/calories', methods=['GET'])
-def add_calories():
-    return "Endpoint not constructed yet"
-
-
-@app.route('/nutritional/weight', methods=['POST'])
 def get_weight():
     return "Endpoint not constructed yet"
 
 
-@app.route('/nutritional/calories', methods=['POST'])
+@app.route('/nutritional/calories', methods=['GET'])
 def get_calories():
     return "Endpoint not constructed yet"
+
+
+@app.route('/nutritional/weight', methods=['POST'])
+def add_weight():
+    username = request.args.get('username')
+    weight = request.args.get('weight')
+    res = users.add_weight_data(username,weight)
+    return res
+
+
+@app.route('/nutritional/calories', methods=['POST'])
+def add_calories():
+    username = request.args.get('username')
+    calories = request.args.get('calories')
+    res = add_calorie_data(username,calories)
+    return res
 
 
 
