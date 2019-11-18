@@ -21,22 +21,12 @@ def get_new_account_info():
     username = request.args.get('username')
     password = request.args.get('password')
 
-    if len(username) == 0:
-        return render_template('adduser.html',message = "Please enter a username")
-    if len(password) == 0:
-        return render_template('adduser.html', message="Please enter a password",userin=username)
-    if len(password) < 6:
-        return render_template('adduser.html', message="Password must be longer than 6 characters",userin=username)
-    if users.userexists(username):
-        return render_template('adduser.html', message="username entered is already in use")
-
     #redirect back to login page
     res = users.adduser(username, password)
-    assert res == 0
-    return render_template('login.html',message="User account created successfully")
+    return str(res)
 
 @app.route('/isloggedin')
-def check_logged_in(),:
+def check_logged_in():
     username = request.args.get('username')
     res= users.check_login_status(username)
     return str(res) 
