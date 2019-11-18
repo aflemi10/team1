@@ -263,6 +263,28 @@ class userdb:
             print(e)
             return -1
 
+    def get_weight(username):
+        try:
+            assert self.check_login_status(username)
+            res = self.get_user_full(username)
+            res = res['user_profile']
+            res = res["weight_data"]
+            res =str(res)
+            return res
+        except Exception as e:
+            print(e)
+
+
+    def get_calories(username):
+        try:
+            assert self.check_login_status(username)
+            res = self.get_user_full(username)
+            res = res['user_profile']
+            res = res["cal_data"]
+            res =str(res)
+            return res
+        except Exception as e:
+            print(e)
 
     # db use only
     # returns true if user exists

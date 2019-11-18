@@ -131,12 +131,16 @@ def get_items():
 
 @app.route('/nutritional/weight', methods=['GET'])
 def get_weight():
-    return "Endpoint not constructed yet"
+    username = request.args.get('username')
+    res = users.get_weight(username)
+    return res
 
 
 @app.route('/nutritional/calories', methods=['GET'])
 def get_calories():
-    return "Endpoint not constructed yet"
+    username = request.args.get('username')
+    res = users.get_calories(username)
+    return res
 
 
 @app.route('/nutritional/weight', methods=['POST'])
