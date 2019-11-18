@@ -117,20 +117,20 @@ def remove_items():
 def get_items():
     username = request.args.get('username')
     res = users.get_items(username)
-    return res
+    return str(res)
 
 @app.route('/nutritional/weight', methods=['GET'])
 def get_weight():
     username = request.args.get('username')
     res = users.get_weight(username)
-    return res
+    return str(res)
 
 
 @app.route('/nutritional/calories', methods=['GET'])
 def get_calories():
     username = request.args.get('username')
     res = users.get_calories(username)
-    return res
+    return str(res)
 
 
 @app.route('/nutritional/weight', methods=['POST'])
@@ -138,15 +138,15 @@ def add_weight():
     username = request.args.get('username')
     weight = request.args.get('weight')
     res = users.add_weight_data(username,weight)
-    return res
+    return str(res)
 
 
 @app.route('/nutritional/calories', methods=['POST'])
 def add_calories():
     username = request.args.get('username')
     calories = request.args.get('calories')
-    res = add_calorie_data(username,calories)
-    return res
+    res = users.add_calorie_data(username,calories)
+    return str(res)
 
 
 

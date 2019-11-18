@@ -212,9 +212,11 @@ class userdb:
             items = res['user_profile']['items']
             weight_data = res['user_profile']['weight_data']
             cal_data = res['user_profile']['cal_data']
+            now = datetime.now()
+            date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
             new_cal_data={
-                'datetime',datetime.now(),
-                'calories',weight
+                'datetime':date_time,
+                'calories':calories
             }
 
             cal_data.append(new_cal_data)
@@ -241,9 +243,11 @@ class userdb:
             items = res['user_profile']['items']
             weight_data = res['user_profile']['weight_data']
             cal_data = res['user_profile']['cal_data']
+            now =datetime.now()
+            date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
             new_weight_data={
-                'datetime',datetime.now(),
-                'weight',weight
+                'datetime':date_time,
+                'weight':weight
             }
 
             weight_data.append(new_weight_data)
@@ -263,7 +267,7 @@ class userdb:
             print(e)
             return -1
 
-    def get_weight(username):
+    def get_weight(self,username):
         try:
             assert self.check_login_status(username)
             res = self.get_user_full(username)
@@ -275,7 +279,7 @@ class userdb:
             print(e)
 
 
-    def get_calories(username):
+    def get_calories(self,username):
         try:
             assert self.check_login_status(username)
             res = self.get_user_full(username)
