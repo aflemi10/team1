@@ -38,4 +38,5 @@ def scrape(itemname,zipcode):
         print(e)
         return -1
 
-scrape("milk","22030")
+x= scrape("milk","22030")
+print(x)
