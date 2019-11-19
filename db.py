@@ -336,6 +336,3 @@ class itemdb:
             return self.client.get(index=item_zip,id=1)
         else:
              return None
-
-items= itemdb(None)
-print(items.search_item("milk-90210"))
