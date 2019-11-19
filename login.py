@@ -49,7 +49,7 @@ def do_login():
         except Exception as e:
             username = request.args.get('username')
             password = request.args.get('password')
-        pprint.pprint(request.__dict__)
+
         res=users.login(username,password)
         # TODO : add more verification to username and password if needed
         # TODO : hash and salt password inputs before anything else
@@ -147,7 +147,14 @@ def add_calories():
     res = users.add_calorie_data(username,calories)
     return str(res)
 
-
+@app.route('/pricecompare',methods = ['GET'])
+def get_price_data():
+    username = request.args.get('username')
+    itemname = request.args.get('item_name')
+    zipcode = request.args.get('zipcode')
+    item_zip = (f'{item_name}-{zipcode}')
+    res = items.get_pricing_data(item_zip)
+    return jsonify(res)
 
 
 

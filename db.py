@@ -1,6 +1,7 @@
 from elasticsearch import Elasticsearch,NotFoundError
 import pprint,os
 from datetime import datetime
+import scrape
 #creating a class using elasticsearch
 class userdb:
 
@@ -305,73 +306,36 @@ class itemdb:
             self.client=Elasticsearch(host)
         self.items = 0
 
-    #Should be redone
-    def get_item_by_name(self, item_name):
-        res =self.client.search(index="*", body={"query": {"match": {'name': item_name}}})
-        print("---")
-        pprint.pprint(res)
-        print("---")
-        return res
-
-    def newitem(self,item_name,price,quantity):
-        item_num = self.get_new_item_num()
-        print(item_num)
-        if not self.client.indices.exists(item_num):
-            doc = {
-                'item_name': item_name,
-                'price':price,
-                'quantity':quantity
+    def get_pricing_data(self,item_zip):
+        # try searching for data
+        # if there return
+        # if not there add item-zip to database then scrape
+        res = self.search_item(item_zip)
+        if res == None:
+            print("----------------------not found----------------------")
+            now =datetime.now()
+            date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
+            info = item_zip.split("-")
+            res = scrape.scrape(info[0],info[1])
+            item = {
+                'item_zip':item_zip,
+                'timestamp':date_time,
+                'pricing_info':res
             }
-            res = self.client.index(index=item_num, id=1, body=doc)
-           # print(res)
-            return item_num
-        else:
-            return -1
-
-    def print_item_full(self,item_num):
-        res =self.client.get(index=item_num,id=1)
-        pprint.pprint(res['_source'])
-
-    def get_new_item_num(self):
-        self.items+=1
-        return self.items
-
-    def get_item_full(self, itemnum):
-        try:
-            res = self.client.get(index=itemnum, id=1)
-            res = res
+            self.client.index(index=item_zip,id=1, body=item)
             return res
-        except Exception as e:
-            raise e
+        else:
+            print("-------------------found---------------------")
+            return res
 
+    def itemexists(self, item_zip):
+        return self.client.indices.exists(index=item_zip)
 
-    def searchitem(self,name):
-        return None
+    def search_item(self,item_zip):
+        if self.itemexists(item_zip):
+            return self.client.get(index=item_zip,id=1)
+        else:
+             return None
 
-def test():
-    os.system("curl -XDELETE localhost:9200/*")
-    udb = userdb(None)
-    #login user
-    res=udb.adduser("allen","oofoof")
-    res=udb.login("allen","oofoof")
-    res = udb.clear_fields("allen")
-    res=udb.add_item("allen","1")
-    udb.print_user_pretty("allen")
-    print("\n")
-    res=udb.add_item("allen","2")
-    udb.print_user_pretty("allen")
-
-
-    idb = itemdb(None)
-    res = idb.newitem("apples","5.99","3")
-    print(res)
-    print("---")
-    res = idb.newitem("oranges","3.00","12")
-    print(res)
-    idb.print_item_full(1)
-    idb.print_item_full(2)
-
-    idb.get_item_by_name("apples")
-
-    os.system("curl -XDELETE localhost:9200/*")
-    #
+items= itemdb(None)
+print(items.search_item("milk-90210"))
