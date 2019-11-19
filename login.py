@@ -1,4 +1,4 @@
-from flask import Flask, flash, redirect, render_template, request, session,url_for
+from flask import Flask, flash, redirect, render_template, request, session,url_for,jsonify
 from db import userdb,itemdb
 import hashlib
 import pprint
@@ -116,8 +116,7 @@ def remove_items():
 @app.route('/items/get', methods=['GET'])
 def get_items():
     username = request.args.get('username')
-    res = users.get_items(username)
-    return str(res)
+    return  jsonify(users.get_items(username))
 
 @app.route('/nutritional/weight', methods=['GET'])
 def get_weight():

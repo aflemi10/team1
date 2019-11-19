@@ -159,6 +159,7 @@ def scrape(zipcode,grocery_item):
             raise e
         finally:
             driver.close()
+            exit()
 
 def test():
     zipcodes=["22193","22030","20603","22192","22032"]

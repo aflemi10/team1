@@ -119,8 +119,7 @@ class userdb:
             assert self.check_login_status(username)
             res = self.get_user_full(username)
             res = res['user_profile']
-            res = res["items"]
-            res =str(res)
+            res = res['items']
             return res
         except Exception as e:
             print(e)
