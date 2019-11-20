@@ -326,7 +326,7 @@ class itemdb:
             return res
         else:
             print("-------------------found---------------------")
-            return res
+            return res['_source']['pricing_info']
 
     def itemexists(self, item_zip):
         return self.client.indices.exists(index=item_zip)
