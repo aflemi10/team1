@@ -122,7 +122,7 @@ def get_items():
 def get_weight():
     username = request.args.get('username')
     res = users.get_weight(username)
-    return str(res)
+    return jsonify(res)
 
 
 @app.route('/nutritional/calories', methods=['GET'])
