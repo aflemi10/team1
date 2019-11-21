@@ -95,15 +95,15 @@ def add_item():
     username = request.args.get('username')
     itemname = request.args.get('item_name')
     expiration = request.args.get('expr_date')
-    price = request.args.get('price')
+    quantity = request.args.get('quantity')
     if(expiration==None):
         expiration='null'
 
-    if(price==None):
-        price='null'
+    if(quantity==None):
+        quantity='1'
 
 
-    res = users.add_item(username,itemname,expiration,price)
+    res = users.add_item(username,itemname,expiration,quantity)
 
     return str(res)
 

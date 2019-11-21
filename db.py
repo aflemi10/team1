@@ -125,7 +125,7 @@ class userdb:
         except Exception as e:
             print(e)
 
-    def add_item(self,username,name,expiration,price):
+    def add_item(self,username,name,expiration,quantity):
         try:
             res = self.get_user_full(username)
             assert self.check_login_status(username)
@@ -135,7 +135,7 @@ class userdb:
             newitem={
                 'name':name,
                 'expiration':expiration,
-                'price':price
+                'quantity':quantity
             }
 
             items.append(newitem)
