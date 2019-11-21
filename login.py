@@ -137,7 +137,7 @@ def add_weight():
     username = request.args.get('username')
     weight = request.args.get('weight')
     res = users.add_weight_data(username,weight)
-    return str(res)
+    return jsonify(res)
 
 
 @app.route('/nutritional/calories', methods=['POST'])
@@ -145,14 +145,14 @@ def add_calories():
     username = request.args.get('username')
     calories = request.args.get('calories')
     res = users.add_calorie_data(username,calories)
-    return str(res)
+    return jsonify(res)
 
 @app.route('/pricecompare',methods = ['GET'])
 def get_price_data():
     username = request.args.get('username')
     itemname = request.args.get('item_name')
     zipcode = request.args.get('zipcode')
-    item_zip = (f'{item_name}-{zipcode}')
+    item_zip = (f'{itemname}-{zipcode}')
     res = items.get_pricing_data(item_zip)
     return jsonify(res)
 
