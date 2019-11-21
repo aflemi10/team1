@@ -365,7 +365,23 @@ class userdb:
     # -1 = error
     #  0 = user added
     #  1 = user already exists
+    #  2 = No capital letters in password
+    #  3 = No lowercase letters in password
+    #  4 = No numbers in password
+    #  5 = Password too short
     def adduser(self,username,password):
+        if(password.islower()):
+            return 2
+
+        if(password.isupper()):
+            return 3
+
+        if (bool(re.search(r'\d', password))):
+            return 4
+
+        if len(password)<6:
+            return 5
+
         try:
             if not self.userexists(username):
                 doc = {

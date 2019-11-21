@@ -28,7 +28,10 @@ def get_new_account_info():
 
     #redirect back to login page
     res = users.adduser(username, password)
-    return str(res)
+    if res == 0:
+        return 0
+    else:
+        return "Error"
 
 @app.route('/isloggedin')
 def check_logged_in():
@@ -65,10 +68,10 @@ def do_login():
             return res['user_profile']
 
         if res == 1:
-            return render_template('login.html',message = "Username not found")
+            return "Username not found"
 
         if res == 2:
-            return render_template('login.html',message = "Incorrect password",userin = username)
+            return "password incorrect"
     except Exception as e:
         return e
 
