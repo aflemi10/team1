@@ -112,6 +112,10 @@ def add_item():
 def remove_items():
     return "Endpoint not constructed yet"
 
+@app.route('/nutritional/get_formatted_cal_data',methods=['GET'])
+def oof():
+    username=request.args.get('username')
+    return jsonify(users.get_formatted_cal_data(username))
 
 @app.route('/items/get', methods=['GET'])
 def get_items():

@@ -173,8 +173,194 @@ class userdb:
         except Exception as e:
             return 1
 
+    def construct_test_user(self):
+        doc = {
+            'password': "password",
+            'is_logged_in': "True",
+            'user_profile':{
+                'username':"test-user",
+                'items': [],
+                'weight_data': [],
+                'cal_data': [{
+                    'datetime':"11/22/2019",
+                    'calories':"100"
+                    },
+                    {
+                    'datetime':"11/22/2019",
+                    'calories':"200"
+                    },
+                    {
+                        'datetime':"10/23/2018",
+                        'calories':"300"
+                    },
+                    {
+                        'datetime':"11/24/2018",
+                        'calories':"400"
+                    },
+                    {
+                        'datetime':"11/23/2019",
+                        'calories':"500"
+                    },
+                    {
+                        'datetime':"11/20/2019",
+                        'calories':"600"
+                    }
+                ]
+                }
+            }
+        res = self.client.index(index="test-user",id=1, body=doc)
+
+    def date1_less_than_date2(self,date_str1,date_str2):
+        ds1y=int(date_str1.split("/")[2])
+        ds2y=int(date_str2.split("/")[2])
+
+        ds1m=int(date_str1.split("/")[0])
+        ds2m=int(date_str2.split("/")[0])
+
+        ds1d=int(date_str1.split("/")[1])
+        ds2d=int(date_str2.split("/")[1])
 
 
+        #compare years
+        if(ds1y != ds2y):
+            if ds1y<ds2y:
+                return True
+            else:
+                return False
+
+        #compare months
+        if(ds1m != ds2m):
+            if ds1m<ds2m:
+                return True
+            else:
+                return False
+
+        #compare days
+        if(ds1d != ds2d):
+            if ds1d<ds2d:
+                return True
+            else:
+                return False
+        return False
+
+    def dates_are_neighbors(self,date_str1,date_str2):
+        ds1y=int(date_str1.split("/")[2])
+        ds2y=int(date_str2.split("/")[2])
+
+        ds1m=int(date_str1.split("/")[0])
+        ds2m=int(date_str2.split("/")[0])
+
+        ds1d=int(date_str1.split("/")[1])
+        ds2d=int(date_str2.split("/")[1])
+
+        if(ds1y != ds2y):
+            return False
+
+        #compare months
+        if(ds1m != ds2m):
+            return False
+
+        #compare days
+        if(ds1d+1 == ds2d or ds1d==ds2d+1):
+                return True
+
+
+        return False
+
+    def process_empty_data_points(self,date_array,data_array):
+        assert len(date_array) == len(data_array)
+        for x in range(len(date_array)-1):
+            while not self.dates_are_neighbors(date_array[x],date_array[x+1]):
+                new_date_day=int(date_array[x].split("/")[1])+1
+                new_date_month=date_array[x].split("/")[0]
+                new_date_year=date_array[x].split("/")[2]
+                new_date = str(new_date_month)+"/"+str(new_date_day)+"/"+str(new_date_year)
+                date_array.insert(x+1,new_date)
+                data_array.insert(x+1,0)
+        return date_array,data_array
+
+    def get_formatted_cal_data(self,username):
+        try:
+            res = self.get_user_full(username)
+            assert self.check_login_status(username)
+            cal_data = res['user_profile']
+            cal_data = cal_data['cal_data']
+            date_array = []
+            output_array = []
+            for dp in cal_data:
+                current_date = dp['datetime']
+                if current_date in date_array:
+                    date_array.index(current_date)
+                else:
+                    date_array.append(current_date)
+
+            for x in date_array:
+                output_array.append(0)
+
+
+
+            for dp in cal_data:
+                current_date = dp['datetime']
+                cals = dp['calories']
+                i = date_array.index(current_date)
+                output_array[i]+=int(cals)
+
+
+
+            for j in range(len(date_array)):
+                for i in range(len(date_array)-1):
+                    res = self.date1_less_than_date2(date_array[i],date_array[i+1])
+                    if not res:
+                        temp = date_array[i]
+                        temp2 = output_array[i]
+
+                        date_array[i]=date_array[i+1]
+                        date_array[i+1]=temp
+
+                        output_array[i]=output_array[i+1]
+                        output_array[i+1] = temp2
+
+            #print(date_array)
+            #print(output_array)
+
+            #finding minimum date based on largest_date
+            largest_date = date_array[len(date_array)-1]
+            minimum_date = int(largest_date.split("/")[1])-7
+            if minimum_date < 1:
+                minimum_date=(31+minimum_date)
+
+            month = largest_date.split("/")[0]
+            year = largest_date.split("/")[2]
+
+            minimum_date=(f'{month}/{minimum_date}/{year}')
+
+            date_array2=[]
+            output_array2=[]
+            for date in date_array:
+                #print(f'minimum_Date:{minimum_date}------date:{date}')
+                if self.date1_less_than_date2(minimum_date,date):
+                    #print("date1 greater than date 2")
+                    date_array2.append(date)
+                    output_array2.append(output_array[date_array.index(date)])
+
+            date_array=date_array2
+            output_array=output_array2
+
+            date_array,output_array=self.process_empty_data_points(date_array,output_array)
+            #insert 0s for data points
+
+            if(len(output_array)>=7):
+                output_array=output_array[len(output_array)-7:]
+
+            if len(output_array)<7:
+                for x in range(7-len(output_array)):
+                    output_array.insert(0,0)
+
+            return(str(output_array))
+
+
+        except Exception as e:
+            raise e
     #returns
     # -1 = error
     #  0 = user added
@@ -213,7 +399,7 @@ class userdb:
             weight_data = res['user_profile']['weight_data']
             cal_data = res['user_profile']['cal_data']
             now = datetime.now()
-            date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
+            date_time = now.strftime("%m/%d/%Y")
             new_cal_data={
                 'datetime':date_time,
                 'calories':calories
@@ -336,3 +522,7 @@ class itemdb:
             return self.client.get(index=item_zip,id=1)
         else:
              return None
+
+udb = userdb(None)
+udb.construct_test_user()
+udb.get_formatted_cal_data("test-user")
