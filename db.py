@@ -2,6 +2,7 @@ from elasticsearch import Elasticsearch,NotFoundError
 import pprint,os
 from datetime import datetime
 import scrape
+import re
 #creating a class using elasticsearch
 class userdb:
 
@@ -376,7 +377,7 @@ class userdb:
         if(password.isupper()):
             return 3
 
-        if (bool(re.search(r'\d', password))):
+        if (not bool(re.search(r'\d', password))):
             return 4
 
         if len(password)<6:

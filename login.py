@@ -29,9 +29,9 @@ def get_new_account_info():
     #redirect back to login page
     res = users.adduser(username, password)
     if res == 0:
-        return 0
+        return str(0)
     else:
-        return "Error"
+        return f'Error-{res}' 
 
 @app.route('/isloggedin')
 def check_logged_in():
