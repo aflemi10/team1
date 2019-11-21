@@ -181,7 +181,30 @@ class userdb:
             'user_profile':{
                 'username':"test-user",
                 'items': [],
-                'weight_data': [],
+                'weight_data': [{
+                    'datetime':"11/21/2019",
+                    'weight':"100"
+                    },
+                    {
+                    'datetime':"11/22/2019",
+                    'weight':"200"
+                    },
+                    {
+                        'datetime':"11/23/2019",
+                        'weight':"300"
+                    },
+                    {
+                        'datetime':"11/24/2018",
+                        'weight':"400"
+                    },
+                    {
+                        'datetime':"11/20/2019",
+                        'weight':"500"
+                    },
+                    {
+                        'datetime':"11/18/2019",
+                        'weight':"60"
+                    }],
                 'cal_data': [{
                     'datetime':"11/22/2019",
                     'calories':"100"
@@ -288,6 +311,8 @@ class userdb:
             cal_data = cal_data['cal_data']
             date_array = []
             output_array = []
+
+            #
             for dp in cal_data:
                 current_date = dp['datetime']
                 if current_date in date_array:
@@ -447,7 +472,10 @@ class userdb:
             weight_data = res['user_profile']['weight_data']
             cal_data = res['user_profile']['cal_data']
             now =datetime.now()
-            date_time = now.strftime("%m/%d/%Y, %H:%M:%S")
+            date_time = now.strftime("%m/%d/%Y")
+            for x in range(len(weight_data)):
+                if weight_data[x]['datetime'] == date_time:
+                    return -1
             new_weight_data={
                 'datetime':date_time,
                 'weight':weight
@@ -480,6 +508,95 @@ class userdb:
             return res
         except Exception as e:
             print(e)
+
+
+    def get_formatted_weight_data(self,username):
+        try:
+            res = self.get_user_full(username)
+            assert self.check_login_status(username)
+            weight_data = res['user_profile']
+            weight_data = weight_data['weight_data']
+            date_array = []
+            output_array = []
+
+            #
+            for dp in weight_data:
+                current_date = dp['datetime']
+                if current_date in date_array:
+                    date_array.index(current_date)
+                else:
+                    date_array.append(current_date)
+
+            for x in date_array:
+                output_array.append(0)
+
+
+
+            for dp in weight_data:
+                current_date = dp['datetime']
+                #print(dp)
+                weight = dp['weight']
+                i = date_array.index(current_date)
+                output_array[i]=weight
+
+
+            for j in range(len(date_array)):
+                for i in range(len(date_array)-1):
+                    res = self.date1_less_than_date2(date_array[i],date_array[i+1])
+                    if not res:
+                        temp = date_array[i]
+                        temp2 = output_array[i]
+
+                        date_array[i]=date_array[i+1]
+                        date_array[i+1]=temp
+
+                        output_array[i]=output_array[i+1]
+                        output_array[i+1] = temp2
+
+            #print(date_array)
+            #print(output_array)
+
+            #finding minimum date based on largest_date
+            largest_date = date_array[len(date_array)-1]
+            minimum_date = int(largest_date.split("/")[1])-7
+            if minimum_date < 1:
+                minimum_date=(31+minimum_date)
+
+            month = largest_date.split("/")[0]
+            year = largest_date.split("/")[2]
+
+            minimum_date=(f'{month}/{minimum_date}/{year}')
+
+            date_array2=[]
+            output_array2=[]
+            for date in date_array:
+                #print(f'minimum_Date:{minimum_date}------date:{date}')
+                if self.date1_less_than_date2(minimum_date,date):
+                    #print("date1 greater than date 2")
+                    date_array2.append(date)
+                    output_array2.append(output_array[date_array.index(date)])
+
+            date_array=date_array2
+            output_array=output_array2
+
+            date_array,output_array=self.process_empty_data_points(date_array,output_array)
+            #insert 0s for data points
+
+            if(len(output_array)>=7):
+                output_array=output_array[len(output_array)-7:]
+
+            if len(output_array)<7:
+                for x in range(7-len(output_array)):
+                    output_array.insert(0,0)
+
+            print(date_array)
+            print(output_array)
+
+            return(str(output_array))
+
+
+        except Exception as e:
+            raise e
 
 
     def get_calories(self,username):
@@ -541,5 +658,15 @@ class itemdb:
              return None
 
 udb = userdb(None)
-udb.construct_test_user()
-udb.get_formatted_cal_data("test-user")
+res =udb.construct_test_user()
+res = udb.add_weight_data("test-user",100)
+print(res)
+res =udb.add_weight_data("test-user",400)
+print(res)
+res =udb.add_weight_data("test-user",500)
+print(res)
+res =udb.add_weight_data("test-user",400)
+print(res)
+res = udb.get_formatted_weight_data("test-user")
+("test-user")
+pprint.pprint(res)

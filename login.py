@@ -31,7 +31,7 @@ def get_new_account_info():
     if res == 0:
         return str(0)
     else:
-        return f'Error-{res}' 
+        return f'Error-{res}'
 
 @app.route('/isloggedin')
 def check_logged_in():
@@ -119,6 +119,11 @@ def remove_items():
 def oof():
     username=request.args.get('username')
     return jsonify(users.get_formatted_cal_data(username))
+
+@app.route('/nutritional/get_formatted_weight_data',methods=['GET'])
+def formatted_weight():
+    username=request.args.get('username')
+    return jsonify(users.get_formatted_weight_data(username))
 
 @app.route('/items/get', methods=['GET'])
 def get_items():
