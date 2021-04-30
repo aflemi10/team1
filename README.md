@@ -1,11 +1,3 @@
-# Requirements
-- Webscraper
-	- Selenium
-	- A chrome webdriver
-- Backend
-	- Elasticsearch ( tested using version 6.5.4 )
-	- Flask
-- Python 3
 # Usage
  1. Download + Install requirements
 	 - [Selenium](http://seleniummaster.com/sitecontent/index.php/selenium-web-driver-menu/selenium-test-automation-with-python-menu/186-how-to-install-selenium-python-webdriver)
